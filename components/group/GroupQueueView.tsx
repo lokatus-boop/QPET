@@ -28,9 +28,8 @@ const getStatusColor = (status: IncidentStatus) => {
 };
 
 const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, users }) => {
-  // FIX: The explicit type annotation was incorrect, causing a TypeScript error. 
-  // The type for `user` is now correctly inferred from the `useAuth` hook.
-  const { user } = useAuth();
+  // FIX: Add an explicit type annotation for the user object to resolve a TypeScript error where the type was being inferred as 'unknown'.
+  const { user }: { user: AppUser | null } = useAuth();
   
   const groupIncidents = useMemo(() => {
     const userGroup = user?.group;

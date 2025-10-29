@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { AuthContext, AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import LoginScreen from './components/auth/LoginScreen';
 import Dashboard from './components/layout/Dashboard';
 import { Equipment, Incident, AppUser } from './types';
 import { auth, db } from './firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, doc, getDoc, onSnapshot, query, orderBy, addDoc, updateDoc } from 'firebase/firestore';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
@@ -14,11 +16,12 @@ function App() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const userDoc = await db.collection('users').doc(firebaseUser.uid).get();
-        if (userDoc.exists) {
-          setCurrentUser({ id: userDoc.id, ...userDoc.data() } as AppUser);
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setCurrentUser({ id: userDocSnap.id, ...userDocSnap.data() } as AppUser);
         } else {
           setCurrentUser(null); // Or handle user not in DB case
         }
@@ -38,17 +41,18 @@ function App() {
       return;
     };
 
-    const unsubUsers = db.collection('users').onSnapshot(snapshot => {
+    const unsubUsers = onSnapshot(collection(db, 'users'), snapshot => {
       const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AppUser));
       setUsers(usersData);
     });
 
-    const unsubEquipment = db.collection('equipment').onSnapshot(snapshot => {
+    const unsubEquipment = onSnapshot(collection(db, 'equipment'), snapshot => {
       const equipmentData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Equipment));
       setEquipment(equipmentData);
     });
 
-    const unsubIncidents = db.collection('incidents').orderBy('history.0.timestamp', 'desc').onSnapshot(snapshot => {
+    const incidentsQuery = query(collection(db, 'incidents'), orderBy('history.0.timestamp', 'desc'));
+    const unsubIncidents = onSnapshot(incidentsQuery, snapshot => {
       const incidentsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Incident));
       setIncidents(incidentsData);
     });
@@ -64,20 +68,21 @@ function App() {
   const addUser = async (user: Omit<AppUser, 'id'>) => {
     // Note: User creation should be handled via Firebase Auth and a backend function for security.
     // This is a simplified client-side addition to Firestore.
-    await db.collection('users').add(user);
+    await addDoc(collection(db, 'users'), user);
   };
 
   const addEquipment = async (item: Omit<Equipment, 'id'>) => {
-    await db.collection('equipment').add(item);
+    await addDoc(collection(db, 'equipment'), item);
   };
 
   const addIncident = async (incident: Omit<Incident, 'id'>) => {
-     await db.collection('incidents').add(incident);
+     await addDoc(collection(db, 'incidents'), incident);
   };
   
   const updateIncident = async (updatedIncident: Incident) => {
     const { id, ...incidentData } = updatedIncident;
-    await db.collection('incidents').doc(id).update(incidentData);
+    const incidentRef = doc(db, 'incidents', id);
+    await updateDoc(incidentRef, incidentData);
   };
 
   if (loading) {
