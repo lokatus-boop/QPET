@@ -28,9 +28,8 @@ const getStatusColor = (status: IncidentStatus) => {
 };
 
 const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, users }) => {
-  // FIX: Cast the user object to the correct type to resolve inference issue.
-  const { user: unknownUser } = useAuth();
-  const user = unknownUser as AppUser | null;
+  // FIX: Destructure user directly from useAuth to ensure correct type inference.
+  const { user } = useAuth();
   
   const groupIncidents = useMemo(() => {
     const userGroup = user?.group;
@@ -54,7 +53,6 @@ const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, u
 
   const getUsernameById = (userId: string) => users.find(u => u.id === userId)?.username || 'Sin asignar';
 
-  // FIX: Correctly check for user and user.group to fix type error and prevent potential runtime errors.
   if (!user || !user.group) {
     return (
       <div>
