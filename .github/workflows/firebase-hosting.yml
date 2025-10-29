@@ -5,11 +5,18 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Usa install (no ci) hasta que el lockfile esté estable
+      - run: npm install
+      - run: npm run build
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
