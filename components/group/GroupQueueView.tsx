@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Incident, Equipment, AppUser, IncidentStatus } from '../../types';
-import { useAuth, AuthContextType } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface GroupQueueViewProps {
   incidents: Incident[];
@@ -28,8 +28,9 @@ const getStatusColor = (status: IncidentStatus) => {
 };
 
 const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, users }) => {
-  // FIX: Explicitly type the destructured user from useAuth to ensure correct type inference.
-  const { user }: AuthContextType = useAuth();
+  // FIX: The explicit type annotation was incorrect, causing a TypeScript error. 
+  // The type for `user` is now correctly inferred from the `useAuth` hook.
+  const { user } = useAuth();
   
   const groupIncidents = useMemo(() => {
     const userGroup = user?.group;
