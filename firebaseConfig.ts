@@ -1,6 +1,6 @@
-// @ts-nocheck
-// IMPORTANT: This file requires the Firebase SDK scripts to be included in index.html
-// The global `firebase` object is expected to be available.
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
 // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 //  1. CREATE A FIREBASE PROJECT at https://console.firebase.google.com/
@@ -18,11 +18,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app;
-if (typeof window !== 'undefined' && !firebase.apps.length) {
-  app = firebase.initializeApp(firebaseConfig);
-} else {
-  app = firebase.app();
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
 
 const auth = firebase.auth();

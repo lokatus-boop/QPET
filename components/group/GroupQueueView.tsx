@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Incident, Equipment, AppUser, IncidentStatus } from '../../types';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, AuthContextType } from '../../context/AuthContext';
 
 interface GroupQueueViewProps {
   incidents: Incident[];
@@ -28,8 +28,8 @@ const getStatusColor = (status: IncidentStatus) => {
 };
 
 const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, users }) => {
-  // FIX: Destructure user directly from useAuth to ensure correct type inference.
-  const { user } = useAuth();
+  // FIX: Explicitly type the destructured user from useAuth to ensure correct type inference.
+  const { user }: AuthContextType = useAuth();
   
   const groupIncidents = useMemo(() => {
     const userGroup = user?.group;
