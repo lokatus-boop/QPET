@@ -1,5 +1,6 @@
 
 
+
 import React, { useMemo } from 'react';
 import { Incident, Equipment, AppUser, IncidentStatus } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -30,8 +31,9 @@ const getStatusColor = (status: IncidentStatus) => {
 };
 
 const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, users }) => {
-  // FIX: Explicitly type the user object to resolve a TypeScript error where its type was being inferred as 'unknown'.
-  const { user }: { user: AppUser | null } = useAuth();
+  // FIX: Replaced the problematic explicit type annotation with standard destructuring. 
+  // Type inference from the correctly-typed useAuth hook now works as expected.
+  const { user } = useAuth();
   
   const groupIncidents = useMemo(() => {
     const userGroup = user?.group;

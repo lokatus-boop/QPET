@@ -1,40 +1,20 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginScreen from './components/auth/LoginScreen';
 import Dashboard from './components/layout/Dashboard';
 import { Equipment, Incident, AppUser } from './types';
-import { auth, db } from './firebaseConfig';
-import { onAuthStateChanged } from 'firebase/auth';
-import { collection, doc, getDoc, onSnapshot, query, orderBy, addDoc, updateDoc } from 'firebase/firestore';
+import { db } from './firebaseConfig';
+import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, doc } from 'firebase/firestore';
 
-function App() {
-  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
-  const [loading, setLoading] = useState(true);
-
+function AppContent() {
+  const { user, loading } = useAuth();
+  
   const [users, setUsers] = useState<AppUser[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          setCurrentUser({ id: userDocSnap.id, ...userDocSnap.data() } as AppUser);
-        } else {
-          setCurrentUser(null); // Or handle user not in DB case
-        }
-      } else {
-        setCurrentUser(null);
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!currentUser) {
+    if (!user) {
       setUsers([]);
       setEquipment([]);
       setIncidents([]);
@@ -62,13 +42,13 @@ function App() {
       unsubEquipment();
       unsubIncidents();
     };
-  }, [currentUser]);
+  }, [user]);
 
 
-  const addUser = async (user: Omit<AppUser, 'id'>) => {
+  const addUser = async (userData: Omit<AppUser, 'id'>) => {
     // Note: User creation should be handled via Firebase Auth and a backend function for security.
     // This is a simplified client-side addition to Firestore.
-    await addDoc(collection(db, 'users'), user);
+    await addDoc(collection(db, 'users'), userData);
   };
 
   const addEquipment = async (item: Omit<Equipment, 'id'>) => {
@@ -94,24 +74,31 @@ function App() {
   }
 
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-        {currentUser ? (
-          <Dashboard 
-            users={users}
-            equipment={equipment}
-            incidents={incidents}
-            addUser={addUser}
-            addEquipment={addEquipment}
-            addIncident={addIncident}
-            updateIncident={updateIncident}
-          />
-        ) : (
-          <LoginScreen />
-        )}
-      </div>
-    </AuthProvider>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      {user ? (
+        <Dashboard 
+          users={users}
+          equipment={equipment}
+          incidents={incidents}
+          addUser={addUser}
+          addEquipment={addEquipment}
+          addIncident={addIncident}
+          updateIncident={updateIncident}
+        />
+      ) : (
+        <LoginScreen />
+      )}
+    </div>
   );
+}
+
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  )
 }
 
 export default App;

@@ -14,6 +14,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, initialData }) 
     type: initialData?.type || 'Portátil',
     purchaseDate: initialData?.purchaseDate || '',
     responseTime: initialData?.responseTime || '8horas',
+    // FIX: Changed default resolutionTime to 'NBD' to align with type definitions.
     resolutionTime: initialData?.resolutionTime || 'NBD',
     group: initialData?.group || Group.Hardware,
   });

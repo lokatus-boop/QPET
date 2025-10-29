@@ -1,3 +1,4 @@
+
 export enum Role {
   Admin = 'admin',
   User = 'user',
@@ -16,6 +17,7 @@ export interface AppUser {
   group?: Group;
 }
 
+// FIX: Replaced 'SDH' with 'NBD' to match usage in the application.
 export type ResponseTime = '1hora' | '2horas' | '4horas' | '8horas' | 'NBD';
 export type ResolutionTime = '2horas' | '4horas' | '8horas' | 'NBD';
 
