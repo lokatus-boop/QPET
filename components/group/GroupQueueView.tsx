@@ -52,7 +52,8 @@ const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, u
 
   const getUsernameById = (userId: string) => users.find(u => u.id === userId)?.username || 'Sin asignar';
 
-  if (!user?.group) {
+  // FIX: Correctly check for user and user.group to fix type error and prevent potential runtime errors.
+  if (!user || !user.group) {
     return (
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Cola de Grupo</h1>
