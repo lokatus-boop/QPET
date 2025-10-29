@@ -1,0 +1,5 @@
+{
+  "name": "FSAS Technologies - QPET Manager",
+  "description": "A comprehensive web application for managing IT equipment, user access, and on-site incident tracking. Features role-based access for administrators and users, incident status management, and SLA time calculation between status changes.",
+  "requestFramePermissions": []
+}
