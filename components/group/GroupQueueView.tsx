@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Incident, Equipment, AppUser, IncidentStatus } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -28,7 +29,7 @@ const getStatusColor = (status: IncidentStatus) => {
 };
 
 const GroupQueueView: React.FC<GroupQueueViewProps> = ({ incidents, equipment, users }) => {
-  // FIX: Add an explicit type annotation for the user object to resolve a TypeScript error where the type was being inferred as 'unknown'.
+  // FIX: Explicitly type the user object to resolve a TypeScript error where its type was being inferred as 'unknown'.
   const { user }: { user: AppUser | null } = useAuth();
   
   const groupIncidents = useMemo(() => {
